@@ -29,7 +29,7 @@
  */
 
 /* Includes */
-#include <MPU6050.h>
+#include <MPU6050_def.h>
 #include "stm32f10x_i2c.h"
 #include "stm32f10x_gpio.h"
 

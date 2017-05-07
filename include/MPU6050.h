@@ -12,6 +12,9 @@ class MPU6050 {
 public:
 	MPU6050();
 	virtual ~MPU6050();
+
+	void powerUp();
+
 };
 
 #endif /* MPU6050_H_ */

@@ -10,7 +10,9 @@
 #include "diag/Trace.h"
 
 #include "Timer.h"
+#include "ServoCycleManager.h"
 #include "BlinkLed.h"
+#include "MPU6050.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -41,14 +43,12 @@
 //
 
 // Definitions visible only within this translation unit.
-namespace
-{
-  // ----- Timing definitions -------------------------------------------------
+namespace {
+// ----- Timing definitions -------------------------------------------------
 
-  // Keep the LED on for 2/3 of a second.
-  constexpr Timer::ticks_t BLINK_ON_TICKS = Timer::FREQUENCY_HZ * 3 / 4;
-  constexpr Timer::ticks_t BLINK_OFF_TICKS = Timer::FREQUENCY_HZ
-      - BLINK_ON_TICKS;
+// Keep the LED on for 2/3 of a second.
+constexpr Timer::ticks_t BLINK_ON_TICKS = Timer::FREQUENCY_HZ * 3 / 4;
+constexpr Timer::ticks_t BLINK_OFF_TICKS = Timer::FREQUENCY_HZ - BLINK_ON_TICKS;
 }
 
 // ----- main() ---------------------------------------------------------------
@@ -60,41 +60,41 @@ namespace
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
-int
-main(int argc, char* argv[])
-{
-  // Send a greeting to the trace device (skipped on Release).
-  trace_puts("Hello ARM World!");
+int main(int argc, char* argv[]) {
+	// Send a greeting to the trace device (skipped on Release).
+	trace_puts("Hello ARM World!");
 
-  // At this stage the system clock should have already been configured
-  // at high speed.
-  trace_printf("System clock: %u Hz\n", SystemCoreClock);
+	// At this stage the system clock should have already been configured
+	// at high speed.
+	trace_printf("System clock: %u Hz\n", SystemCoreClock);
 
-  Timer timer;
-  timer.start();
+	Timer timer;
+	timer.start();
 
-  BlinkLed blinkLed;
+	BlinkLed blinkLed;
 
-  // Perform all necessary initialisations for the LED.
-  blinkLed.powerUp();
+	MPU6050 mpu;
 
-  uint32_t seconds = 0;
+	// Perform all necessary initialisations for the peripherals.
+	blinkLed.powerUp();
+	mpu.powerUp();
 
-  // Infinite loop
-  while (1)
-    {
-      blinkLed.turnOn();
-      timer.sleep(seconds== 0 ? Timer::FREQUENCY_HZ : BLINK_ON_TICKS);
+	uint32_t seconds = 0;
 
-      blinkLed.turnOff();
-      timer.sleep(BLINK_OFF_TICKS);
+	// Infinite loop
+	while (1) {
+		blinkLed.turnOn();
+		timer.sleep(seconds == 0 ? Timer::FREQUENCY_HZ : BLINK_ON_TICKS);
 
-      ++seconds;
+		blinkLed.turnOff();
+		timer.sleep(BLINK_OFF_TICKS);
 
-      // Count seconds on the trace device.
-      trace_printf("Second %u\n", seconds);
-    }
-  // Infinite loop, never return.
+		++seconds;
+
+		// Count seconds on the trace device.
+		trace_printf("Second %u\n", seconds);
+	}
+	// Infinite loop, never return.
 }
 
 #pragma GCC diagnostic pop
