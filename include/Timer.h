@@ -17,6 +17,7 @@ public:
 
 private:
 	static volatile ticks_t ms_delayCount;
+	static volatile uint8_t newTick;
 
 public:
 	// Default constructor
@@ -27,15 +28,19 @@ public:
 		SysTick_Config(SystemCoreClock / FREQUENCY_HZ);
 	}
 
-	static void
-	sleep(ticks_t ticks);
+	static void sleep(ticks_t ticks);
+
+	static void waitNewTick(void);
 
 	inline static void tick(void) {
 		// Decrement to zero the counter used by the delay routine.
 		if (ms_delayCount != 0u) {
 			--ms_delayCount;
 		}
+		//indicate new tick
+		newTick = 1;
 	}
+
 };
 
 // ----------------------------------------------------------------------------

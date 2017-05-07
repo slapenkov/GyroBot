@@ -23,4 +23,13 @@ void BlinkLed::powerUp() {
 	turnOff();
 }
 
+void BlinkLed::toggle() {
+	if (GPIO_ReadOutputDataBit(BLINK_GPIOx(BLINK_PORT_NUMBER),
+			BLINK_PIN_MASK(BLINK_PIN_NUMBER)) == Bit_RESET) {
+		GPIO_SetBits(BLINK_GPIOx(BLINK_PORT_NUMBER),
+				BLINK_PIN_MASK(BLINK_PIN_NUMBER));
+	} else
+		GPIO_ResetBits(BLINK_GPIOx(BLINK_PORT_NUMBER),
+				BLINK_PIN_MASK(BLINK_PIN_NUMBER));
+}
 // ----------------------------------------------------------------------------

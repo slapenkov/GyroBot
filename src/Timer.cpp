@@ -15,6 +15,7 @@ extern "C" void HAL_IncTick(void);
 // ----------------------------------------------------------------------------
 
 volatile Timer::ticks_t Timer::ms_delayCount;
+volatile uint8_t Timer::newTick;
 
 // ----------------------------------------------------------------------------
 
@@ -26,6 +27,11 @@ void Timer::sleep(ticks_t ticks) {
 		;
 }
 
+void Timer::waitNewTick(void) {
+	while (newTick == 0); //wait for new tick
+	newTick = 0;
+}
+
 // ----- SysTick_Handler() ----------------------------------------------------
 
 extern "C" void SysTick_Handler(void) {
@@ -34,5 +40,4 @@ extern "C" void SysTick_Handler(void) {
 #endif
 	Timer::tick();
 }
-
 // ----------------------------------------------------------------------------
