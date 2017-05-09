@@ -17,6 +17,7 @@
 
 // ----------------------------------------------------------------------------
 //
+int16_t accelGyro[6] = { 0 };
 
 // ----- main() ---------------------------------------------------------------
 
@@ -37,23 +38,33 @@ int main(int argc, char* argv[]) {
 
 	Timer timer;
 	timer.start();
-	trace_printf("System timer 1 mS start...\n");
+	trace_puts("System timer 1 mS started...");
 
 	MPU6050 mpu;
 	BlinkLed led;
 
 	// Perform all necessary initializations for the peripherals.
 	led.powerUp();
+	trace_puts("Led periph started...");
 	mpu.powerUp();
+	trace_puts("MPU subsystem started...");
 
 	uint32_t mseconds = 0;
+	// Initialize external devices
+	mpu.initialize();
+	trace_puts("MPU initialized...");
 
 	trace_printf("Entering to infinite loop...\n");
 	// Infinite loop
 	while (1) {
-		timer.waitNewTick();
+		timer.waitNewTick(); //wait 1mS tick
 		if (mseconds > 499) {
 			led.toggle();
+			mpu.readAccelGyro(accelGyro);
+			trace_printf("Some data %i:%i:%i-%i:%i:%i\n", accelGyro[0],
+					accelGyro[1], accelGyro[2], accelGyro[3], accelGyro[4],
+					accelGyro[5]);
+
 			mseconds = 0;
 		} else
 			mseconds++;
