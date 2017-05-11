@@ -39,7 +39,9 @@ void LeftWheel::powerUp() {
 	oc.TIM_OCMode = TIM_OCMode_PWM1;
 	oc.TIM_Pulse = 0;
 	oc.TIM_OutputState = TIM_OutputState_Enable;
+	oc.TIM_OutputNState = TIM_OutputNState_Disable;
 	oc.TIM_OCPolarity = TIM_OCPolarity_High;
+	oc.TIM_OCIdleState = TIM_OCIdleState_Reset;
 	TIM_OC1Init(TIM17, &oc);
 
 	TIM_OC1PreloadConfig(TIM17, TIM_OCPreload_Enable);

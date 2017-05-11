@@ -26,7 +26,7 @@ void RightWheel::powerUp() {
 	GPIO_Init(GPIOA, &gpio);
 
 	//timer 17 init
-	RCC_APB2PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //clock
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //clock
 
 	TIM_TimeBaseInitTypeDef tim;
 	tim.TIM_Prescaler = (uint16_t) (SystemCoreClock / 200000) - 1; //set timer frequency
