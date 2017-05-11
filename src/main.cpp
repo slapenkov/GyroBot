@@ -12,8 +12,9 @@
 
 #include "Timer.h"
 #include "MPU6050.h"
-#include "StepperServo.h"
 #include "BlinkLed.h"
+#include "LeftWheel.h"
+#include "RightWheel.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -42,12 +43,17 @@ int main(int argc, char* argv[]) {
 
 	MPU6050 mpu;
 	BlinkLed led;
+	LeftWheel leftWheel;
+	RightWheel rightWheel;
 
 	// Perform all necessary initializations for the peripherals.
 	led.powerUp();
 	trace_puts("Led periph started...");
 	mpu.powerUp();
 	trace_puts("MPU subsystem started...");
+	leftWheel.powerUp();
+	rightWheel.powerUp();
+	trace_puts("Wheels initialized...");
 
 	uint32_t mseconds = 0;
 	// Initialize external devices
