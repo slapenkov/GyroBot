@@ -10,6 +10,8 @@
 
 #include "stm32f10x.h"
 
+#define PWM_PERIOD 200
+
 class LeftWheel {
 public:
 	LeftWheel() = default;
