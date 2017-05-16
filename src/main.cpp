@@ -72,8 +72,9 @@ int main(int argc, char* argv[]) {
 	//kalman.SetState(0, 0.1);
 
 	AverageFilter filterX, filterZ;
-	double Kp = 1000, Ki = 0, Kd = 0;
+	double Kp = 2000, Ki = 500, Kd = 0;
 	Pid pid(&ang, &speed, &setPoint, Kp, Ki, Kd, REVERSE);
+	pid.SetOutputLimits(-3000, 3000);
 	pid.SetMode(AUTOMATIC);
 	trace_puts("Starting PID...");
 
@@ -81,7 +82,7 @@ int main(int argc, char* argv[]) {
 	// Infinite loop
 	while (1) {
 		timer.waitNewTick(); //wait 1mS tick
-		if (mseconds > 9) {
+		if (mseconds > 4) {
 			led.toggle();
 
 			//getting accelerometer data
