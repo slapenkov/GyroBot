@@ -18,10 +18,15 @@
 //#include "KalmanFilterSimple1D.h"
 #include "AverageFilter.h"
 #include "math.h"
+#include "Pid.h"
 
 // ----------------------------------------------------------------------------
 //
 int16_t accelGyro[6] = { 0 };
+
+double ang = 0;
+double speed = 0;
+double setPoint = 0;
 
 // ----- main() ---------------------------------------------------------------
 
@@ -67,6 +72,10 @@ int main(int argc, char* argv[]) {
 	//kalman.SetState(0, 0.1);
 
 	AverageFilter filterX, filterZ;
+	double Kp = 1000, Ki = 0, Kd = 0;
+	Pid pid(&ang, &speed, &setPoint, Kp, Ki, Kd, REVERSE);
+	pid.SetMode(AUTOMATIC);
+	trace_puts("Starting PID...");
 
 	trace_printf("Entering to infinite loop...\n");
 	// Infinite loop
@@ -81,21 +90,22 @@ int main(int argc, char* argv[]) {
 			double z = mpu.getZaccel();
 
 			//calculate angle from filtered orthogonal accelerometers data
-			double ang = atan2(filterX.filtering(x), filterZ.filtering(z));
+			ang = atan2(filterX.filtering(x), filterZ.filtering(z));
 			//kalman.Correct(ang);
 			//double angle = kalman.getState();
 			//trace_printf("Angle: %f \n", ang);
 
-
 			//balancing regulator
-			int16_t speed = int(3000 * ang);
+			//int16_t speed = int(3000 * ang);
+
+			pid.Compute();
 			if (abs(speed) < 30)
 				speed = 0;
 
-			//trace_printf("Speed: %i \n", speed);
+			//trace_printf("Speed: %f \n", speed);
 
-			leftWheel.setSpeed(speed);
-			rightWheel.setSpeed(speed);
+			leftWheel.setSpeed((int16_t) speed);
+			rightWheel.setSpeed((int16_t) speed);
 
 			mseconds = 0;
 		} else
