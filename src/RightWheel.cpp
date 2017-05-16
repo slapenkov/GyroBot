@@ -18,7 +18,7 @@ void RightWheel::powerUp() {
 	gpio.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &gpio);
 
-	GPIO_ResetBits(GPIOC, GPIO_Pin_4);
+	GPIO_SetBits(GPIOC, GPIO_Pin_4);
 
 	//PWM gpiof pin 6 init
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE); //clock
@@ -55,16 +55,20 @@ void RightWheel::powerUp() {
 	TIM3->CCER |= TIM_CCER_CC1E;
 
 	//init start value
-	setSpeed(1000);
+	setSpeed(0);
 
 }
 
 void RightWheel::setSpeed(int16_t speed) {
 	if (speed != 0) {
 		TIM_PrescalerConfig(TIM3,
-				(uint16_t) (SystemCoreClock / (PWM_PERIOD * speed)) - 1,
-				TIM_PSCReloadMode_Update);
-		TIM_SetCompare1(TIM3, 100);
+				(uint16_t) (SystemCoreClock / (PWM_PERIOD * abs(speed))) - 1,
+				TIM_PSCReloadMode_Immediate);
+		TIM_SetCompare1(TIM3, 10);
+		if (speed > 0) {
+			GPIO_ResetBits(GPIOC, GPIO_Pin_4);
+		} else
+			GPIO_SetBits(GPIOC, GPIO_Pin_4);
 	} else
 		TIM_SetCompare1(TIM3, 0);
 }

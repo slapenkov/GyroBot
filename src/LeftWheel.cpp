@@ -36,7 +36,7 @@ void LeftWheel::powerUp() {
 	TIM_TimeBaseInitTypeDef tim;
 	tim.TIM_Prescaler = (uint16_t) (SystemCoreClock / 200000) - 1; //set timer frequency
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
-	tim.TIM_ClockDivision = TIM_CKD_DIV1;
+	tim.TIM_ClockDivision = TIM_CKD_DIV4;
 	tim.TIM_Period = 200;
 	TIM_TimeBaseInit(TIM17, &tim);
 
@@ -63,15 +63,19 @@ void LeftWheel::powerUp() {
 	TIM17->CCER |= TIM_CCER_CC1E;
 
 	//init start value
-	setSpeed(1000);
+	setSpeed(0);
 }
 
 void LeftWheel::setSpeed(int16_t speed) {
 	if (speed != 0) {
+		if (speed > 0) {
+			GPIO_SetBits(GPIOC, GPIO_Pin_5);
+		} else
+			GPIO_ResetBits(GPIOC, GPIO_Pin_5);
 		TIM_PrescalerConfig(TIM17,
-				(uint16_t) (SystemCoreClock / (PWM_PERIOD * speed)) - 1,
-				TIM_PSCReloadMode_Update);
-		TIM_SetCompare1(TIM17, 100);
+				(uint16_t) (SystemCoreClock / (PWM_PERIOD * abs(speed))) - 1,
+				TIM_PSCReloadMode_Immediate);
+		TIM_SetCompare1(TIM17, 10);
 	} else
 		TIM_SetCompare1(TIM17, 0);
 }

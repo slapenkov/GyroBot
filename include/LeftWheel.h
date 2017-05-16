@@ -8,6 +8,7 @@
 #ifndef LEFTWHEEL_H_
 #define LEFTWHEEL_H_
 
+#include <stdlib.h>
 #include "stm32f10x.h"
 
 #define PWM_PERIOD 200

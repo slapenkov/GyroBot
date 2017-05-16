@@ -15,6 +15,9 @@
 #include "BlinkLed.h"
 #include "LeftWheel.h"
 #include "RightWheel.h"
+//#include "KalmanFilterSimple1D.h"
+#include "AverageFilter.h"
+#include "math.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -60,16 +63,39 @@ int main(int argc, char* argv[]) {
 	mpu.initialize();
 	trace_puts("MPU initialized...");
 
+	//KalmanFilterSimple1D kalman(1, 1, 10, 10);
+	//kalman.SetState(0, 0.1);
+
+	AverageFilter filterX, filterZ;
+
 	trace_printf("Entering to infinite loop...\n");
 	// Infinite loop
 	while (1) {
 		timer.waitNewTick(); //wait 1mS tick
-		if (mseconds > 499) {
+		if (mseconds > 9) {
 			led.toggle();
-			mpu.readAccelGyro(accelGyro);
-			trace_printf("Some data %i:%i:%i-%i:%i:%i\n", accelGyro[0],
-					accelGyro[1], accelGyro[2], accelGyro[3], accelGyro[4],
-					accelGyro[5]);
+
+			//getting accelerometer data
+			mpu.updateAccelGyro();
+			double x = mpu.getXaccel();
+			double z = mpu.getZaccel();
+
+			//calculate angle from filtered orthogonal accelerometers data
+			double ang = atan2(filterX.filtering(x), filterZ.filtering(z));
+			//kalman.Correct(ang);
+			//double angle = kalman.getState();
+			//trace_printf("Angle: %f \n", ang);
+
+
+			//balancing regulator
+			int16_t speed = int(3000 * ang);
+			if (abs(speed) < 30)
+				speed = 0;
+
+			//trace_printf("Speed: %i \n", speed);
+
+			leftWheel.setSpeed(speed);
+			rightWheel.setSpeed(speed);
 
 			mseconds = 0;
 		} else

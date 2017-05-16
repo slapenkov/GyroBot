@@ -25,13 +25,17 @@ public:
 		MPU6050_Initialize();
 	}
 
-	void readAccelGyro(int16_t * accelGyro) {
+	void updateAccelGyro() {
 		MPU6050_GetRawAccelGyro(accelGyro);
-		//return this->accelGyro;
 	}
 
-	/*private:
-	 int16_t accelGyro[6];*/
+	double getXaccel();
+	double getZaccel();
+
+	double getXZangle();
+
+private:
+	int16_t accelGyro[6];
 };
 
 #endif /* MPU6050_H_ */
