@@ -5,6 +5,11 @@
  *
  * */
 
+
+#define REMOTEXY_MODE__HARDSERIAL
+#define REMOTEXY_SERIAL Serial
+#define REMOTEXY_SERIAL_SPEED 9600
+
 // ----------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +24,7 @@
 #include "AverageFilter.h"
 #include "math.h"
 #include "Pid.h"
+#include "RemoteXY.h"
 
 // ----------------------------------------------------------------------------
 //
