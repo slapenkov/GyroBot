@@ -5,11 +5,6 @@
  *
  * */
 
-
-#define REMOTEXY_MODE__HARDSERIAL
-#define REMOTEXY_SERIAL Serial
-#define REMOTEXY_SERIAL_SPEED 9600
-
 // ----------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,10 +19,36 @@
 #include "AverageFilter.h"
 #include "math.h"
 #include "Pid.h"
+#include "HardwareSerial.h"
+// ----------------------------------------------------------------------------
+//Remote control include
+#define REMOTEXY_MODE__HARDSERIAL
+
 #include "RemoteXY.h"
 
-// ----------------------------------------------------------------------------
-//
+HardwareSerial Serial;
+
+#define REMOTEXY_SERIAL Serial
+#define REMOTEXY_SERIAL_SPEED 9600
+
+//interface configuration
+#pragma pack(push, 1)
+uint8_t RemoteXY_CONF[] = { 255, 1, 0, 0, 0, 10, 0, 6, 5, 0, 4, 128, 3, 16, 94,
+		22, 2 };
+
+//struct defined all gui variables
+struct {
+
+	// input variable
+	int8_t slider_1; // =0..100 slider position
+
+	// other variable
+	uint8_t connect_flag;  // =1 if wire connected, else =0
+
+} RemoteXY;
+#pragma pack(pop)
+
+//accelerations
 int16_t accelGyro[6] = { 0 };
 
 double ang = 0;
@@ -69,6 +90,9 @@ int main(int argc, char* argv[]) {
 	rightWheel.powerUp();
 	trace_puts("Wheels initialized...");
 
+	//initialize remote control
+	RemoteXY_Init();
+
 	uint32_t mseconds = 0;
 	// Initialize external devices
 	mpu.initialize();
@@ -87,6 +111,7 @@ int main(int argc, char* argv[]) {
 	trace_printf("Entering to infinite loop...\n");
 	// Infinite loop
 	while (1) {
+		RemoteXY_Handler(); //handle remote events
 		timer.waitNewTick(); //wait 1mS tick
 		if (mseconds > 4) {
 			led.toggle();

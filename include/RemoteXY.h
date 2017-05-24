@@ -119,11 +119,11 @@
 #include <inttypes.h> 
 #include "classes/RemoteXY_Lib.h"
 
-/*
+
 #if defined(REMOTEXY_PORT__HARDSERIAL) || defined(REMOTEXY__DEBUGLOGS)
   #include <HardwareSerial.h>
 #endif 
-*/
+
 
 
 #if defined(REMOTEXY_MOD__SERIAL) 
@@ -151,7 +151,7 @@
 CRemoteXY *remotexy;   
 
 #define RemoteXY_Handler() remotexy->handler ()
-#define RemoteXY_CONF const PROGMEM RemoteXY_CONF_PROGMEM
+//#define RemoteXY_CONF const PROGMEM RemoteXY_CONF_PROGMEM //define config in programm memory
 
 
 #endif //_REMOTEXY_H_
