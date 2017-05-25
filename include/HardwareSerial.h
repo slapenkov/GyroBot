@@ -13,18 +13,19 @@
 //todo: implement serial class
 
 class HardwareSerial {
+private:
+	static volatile uint8_t bytesAvailable;
 public:
-	HardwareSerial(); //default ctor
-	HardwareSerial(USART_TypeDef* USARTx);
+	HardwareSerial() = default;
 
-	void begin();
-	void begin(long baud);
+	void begin(uint32_t baud);
 
 	void write(uint8_t b);
 
 	uint8_t read();
 
 	uint8_t available();
+
 };
 
 #endif /* HARDWARESERIAL_H_ */
