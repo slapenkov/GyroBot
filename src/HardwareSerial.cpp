@@ -7,7 +7,13 @@
 
 #include "HardwareSerial.h"
 
+volatile uint8_t HardwareSerial::_rx_buffer_head;
+volatile uint8_t HardwareSerial::_rx_buffer_tail;
+volatile uint8_t HardwareSerial::_tx_buffer_head;
+volatile uint8_t HardwareSerial::_tx_buffer_tail;
 
+uint8_t HardwareSerial::_rx_buffer[SERIAL_RX_BUFFER_SIZE];
+uint8_t HardwareSerial::_tx_buffer[SERIAL_TX_BUFFER_SIZE];
 
 void HardwareSerial::begin(uint32_t baud) {
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -34,9 +40,15 @@ void HardwareSerial::begin(uint32_t baud) {
 	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; //On transmitter and receiver of USART1
 	USART_Init(USART1, &USART_InitStruct); //Store USART1 props
 
+	//interrupt configuring
+	//todo: add interrupt config
+
 	USART_Cmd(USART1, ENABLE); //On USART1
 
-	HardwareSerial::bytesAvailable = 0;
+	_rx_buffer_head = 0;
+	_rx_buffer_tail = 0;
+	_tx_buffer_head = 0;
+	_tx_buffer_tail = 0;
 }
 
 void HardwareSerial::write(uint8_t b) {
@@ -46,10 +58,26 @@ void HardwareSerial::write(uint8_t b) {
 }
 
 uint8_t HardwareSerial::read() {
-	HardwareSerial::bytesAvailable--;
-	return (uint8_t) USART_ReceiveData(USART2);
+	// if the head isn't ahead of the tail, we don't have any characters
+	if (_rx_buffer_head == _rx_buffer_tail) {
+		return -1;
+	} else {
+		uint8_t c = _rx_buffer[_rx_buffer_tail];
+		_rx_buffer_tail = (uint8_t) (_rx_buffer_tail + 1)
+				% SERIAL_RX_BUFFER_SIZE;
+		return c;
+	}
 }
 
 uint8_t HardwareSerial::available() {
-	return HardwareSerial::bytesAvailable;
+	return ((uint8_t) (SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail))
+			% SERIAL_RX_BUFFER_SIZE;
 }
+
+// ----- USART2_Handler() ----------------------------------------------------
+
+extern "C" void USART2_Handler(void) {
+	//test if incoming byte interrupt
+	HardwareSerial::incomingEvent();
+}
+// ----------------------------------------------------------------------------
